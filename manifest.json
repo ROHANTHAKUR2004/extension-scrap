@@ -2,7 +2,6 @@
   "manifest_version": 3,
   "name": "eBay Product Scraper",
   "version": "1.0",
-  "description": "Scrape open eBay product page and save to Google Sheets",
   "permissions": ["activeTab", "scripting", "tabs"],
   "host_permissions": [
     "https://www.ebay.com/*",

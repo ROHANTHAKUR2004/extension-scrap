@@ -4,10 +4,10 @@ if (!window.__EBAY_SCRAPER_LOADED__) {
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action !== "SCRAPE_PRODUCT_FULL") return;
 
-    const url = window.location.href;
+    const url = location.href;
 
-    const itemIdMatch = window.location.pathname.match(/\/itm\/(\d+)/);
-    const itemId = itemIdMatch ? itemIdMatch[1] : "";
+    const itemId =
+      location.pathname.match(/\/itm\/(\d+)/)?.[1] || "";
 
     const title =
       document.querySelector(".x-item-title__mainTitle span")?.innerText || "";
@@ -20,25 +20,19 @@ if (!window.__EBAY_SCRAPER_LOADED__) {
       .map(img => img.src)
       .filter(Boolean);
 
-    // CATEGORY TREE
-    const category = [...document.querySelectorAll(
-      'nav[role="navigation"] a'
-    )]
+    const category = [...document.querySelectorAll('nav[role="navigation"] a')]
       .map(el => el.innerText.trim())
       .filter(Boolean)
       .join(" > ");
 
     const itemSpecifics = {};
-    document
-      .querySelectorAll(".ux-labels-values__labels")
-      .forEach(label => {
-        const key = label.innerText.trim();
-        const value =
-          label.nextElementSibling?.innerText.trim();
-        if (key && value) itemSpecifics[key] = value;
-      });
+    document.querySelectorAll(".ux-labels-values__labels").forEach(label => {
+      const key = label.innerText.trim();
+      const value = label.nextElementSibling?.innerText.trim();
+      if (key && value) itemSpecifics[key] = value;
+    });
 
-    sendResponse({
+    const payload = {
       itemId,
       url,
       title,
@@ -46,21 +40,14 @@ if (!window.__EBAY_SCRAPER_LOADED__) {
       images,
       category,
       itemSpecifics
-    });
+    };
 
     chrome.runtime.sendMessage({
       action: "SAVE_TO_SHEET",
-      payload: {
-        itemId,
-        url,
-        title,
-        price,
-        images,
-        category,
-        itemSpecifics
-      }
+      payload
     });
 
+    sendResponse(payload);
     return true;
   });
 }
